@@ -135,5 +135,5 @@ src/
 ## Author
 
 Sramana Patra
-Computer Science Engineering
+CSE (IoT, Cyber Security & Blockchain Technology) 
 Institute of Engineering and Management (IEM)
