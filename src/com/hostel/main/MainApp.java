@@ -141,6 +141,16 @@ public class MainApp {
 
                     System.out.println("\nThank you for using Hostel Management System.");
                     System.exit(0);
+                case 7:
+                    System.out.print("Enter Student ID: ");
+                    int searchId = sc.nextInt();
+
+                    for(Student s : students){
+                     if(s.getId() == searchId){
+                    System.out.println("Student Found: "+s.getName());
+                    }
+                    }
+                    break;
 
                 default:
 
