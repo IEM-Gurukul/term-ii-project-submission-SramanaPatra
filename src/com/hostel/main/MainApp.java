@@ -43,6 +43,11 @@ public class MainApp {
             System.out.println("6. Exit");
             System.out.println("=================================");
             System.out.print("Enter Choice: ");
+            if(!sc.hasNextInt()){
+               System.out.println("Invalid input! Please enter a number.");
+               sc.next();
+               continue;
+            }
 
             int ch = sc.nextInt();
 
