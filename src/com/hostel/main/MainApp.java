@@ -7,6 +7,11 @@ import com.hostel.util.*;
 import java.util.*;
 
 public class MainApp {
+    public static void printHeader(){
+    System.out.println("\n=================================");
+    System.out.println(" SMART HOSTEL MANAGEMENT SYSTEM ");
+    System.out.println("=================================");
+}
 
     public static void main(String[] args){
 
