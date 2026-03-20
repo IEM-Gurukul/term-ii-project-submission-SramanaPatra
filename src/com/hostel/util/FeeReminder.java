@@ -5,32 +5,31 @@ import java.util.List;
 
 public class FeeReminder extends Thread {
 
-    List<Student> students;
+    private List<Student> students;
 
     public FeeReminder(List<Student> students){
         this.students = students;
     }
 
+    @Override
     public void run(){
 
-        int count = 0;
+        while(true){
 
-        while(count < 5){   // run reminder only 5 times
+            try{
+                Thread.sleep(10000); // check every 10 seconds
+            } catch(InterruptedException e){
+                System.out.println("Reminder thread interrupted");
+            }
 
             for(Student s : students){
 
-                if(!s.isFeePaid())
-                    System.out.println("\n[Reminder] Fee pending for: " + s.getName());
+                if(!s.isFeePaid()){
 
+                    System.out.println("\n🔔 Reminder: Fee pending for student ID "
+                            + s.getId() + " (" + s.getName() + ")");
+                }
             }
-
-            count++;
-
-            try{
-                Thread.sleep(30000);
-            }catch(Exception e){}
-
         }
-
     }
 }

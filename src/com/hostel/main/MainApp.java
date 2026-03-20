@@ -24,15 +24,18 @@ public class MainApp {
         List<Room> rooms = new ArrayList<>();
         List<Complaint> complaints = new ArrayList<>();
 
+        // Room initialization
         rooms.add(new Room(101,2));
         rooms.add(new Room(102,2));
 
         HostelService service = new HostelService(rooms);
 
+        // Start Fee Reminder Thread
         FeeReminder reminder = new FeeReminder(students);
         reminder.start();
 
-        Logger logger = Logger.getInstance(); // ✅ SINGLE LOGGER INSTANCE
+        // Logger instance
+        Logger logger = Logger.getInstance();
 
         while(true){
 
@@ -49,10 +52,11 @@ public class MainApp {
             System.out.println("=================================");
             System.out.print("Enter Choice: ");
 
+            // Input validation
             if(!sc.hasNextInt()){
                 System.out.println("Invalid input! Please enter a number.");
+                logger.log("Invalid menu input");
                 sc.next();
-                logger.log("Invalid menu input entered");
                 continue;
             }
 
@@ -60,13 +64,14 @@ public class MainApp {
 
             switch(ch){
 
+                // 🔹 Add Student
                 case 1:
 
-                    System.out.print("ID: ");
+                    System.out.print("Enter ID: ");
                     int id = sc.nextInt();
                     sc.nextLine();
 
-                    System.out.print("Name: ");
+                    System.out.print("Enter Name: ");
                     String name = sc.nextLine();
 
                     students.add(new Student(id,name));
@@ -76,9 +81,10 @@ public class MainApp {
 
                     break;
 
+                // 🔹 Allocate Room
                 case 2:
 
-                    System.out.print("Student ID: ");
+                    System.out.print("Enter Student ID: ");
                     int sid = sc.nextInt();
 
                     boolean found = false;
@@ -100,20 +106,20 @@ public class MainApp {
                                 logger.log("Room allocation failed: " + e.getMessage());
                                 System.out.println("❌ " + e.getMessage());
                             }
-
                         }
                     }
 
                     if(!found){
-                        logger.log("Room allocation failed: Student ID not found " + sid);
+                        logger.log("Student not found for allocation: " + sid);
                         System.out.println("Student not found.");
                     }
 
                     break;
 
+                // 🔹 Pay Fee
                 case 3:
 
-                    System.out.print("Student ID: ");
+                    System.out.print("Enter Student ID: ");
                     int pid = sc.nextInt();
 
                     boolean paid = false;
@@ -136,6 +142,7 @@ public class MainApp {
 
                     break;
 
+                // 🔹 View Students
                 case 4:
 
                     System.out.println("\n------------------------------------------------");
@@ -151,10 +158,11 @@ public class MainApp {
                                 s.isFeePaid() ? "Paid" : "Pending");
                     }
 
-                    logger.log("Viewed all student records");
+                    logger.log("Viewed student list");
 
                     break;
 
+                // 🔹 Register Complaint
                 case 5:
 
                     System.out.print("Enter Student ID: ");
@@ -176,7 +184,7 @@ public class MainApp {
                         break;
                     }
 
-                    System.out.print("Enter complaint: ");
+                    System.out.print("Enter Complaint: ");
                     String msg = sc.nextLine();
 
                     complaints.add(new Complaint(cid, msg));
@@ -186,6 +194,7 @@ public class MainApp {
 
                     break;
 
+                // 🔹 View Complaints
                 case 6:
 
                     if(complaints.isEmpty()){
@@ -206,6 +215,7 @@ public class MainApp {
 
                     break;
 
+                // 🔹 Search Student
                 case 7:
 
                     System.out.print("Enter Student ID: ");
@@ -226,7 +236,7 @@ public class MainApp {
                             System.out.println("Fee Status: " + (s.isFeePaid() ? "Paid" : "Pending"));
                             System.out.println("-----------------------------------");
 
-                            logger.log("Student searched: ID " + searchId);
+                            logger.log("Student searched: " + searchId);
                             break;
                         }
                     }
@@ -238,15 +248,16 @@ public class MainApp {
 
                     break;
 
+                // 🔹 Exit
                 case 8:
 
-                    logger.log("System exited by user");
+                    logger.log("System exited");
                     System.out.println("\nThank you for using Hostel Management System.");
                     System.exit(0);
 
                 default:
 
-                    logger.log("Invalid menu choice selected: " + ch);
+                    logger.log("Invalid menu choice: " + ch);
                     System.out.println("Invalid choice!");
             }
         }
