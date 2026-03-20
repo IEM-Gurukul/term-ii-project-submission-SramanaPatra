@@ -1,38 +1,34 @@
 package com.hostel.util;
 
 import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class Logger {
 
     private static Logger instance;
 
-    private Logger(){}
+    private Logger() {}
 
     public static Logger getInstance(){
-
-        if(instance==null)
-            instance=new Logger();
-
+        if(instance == null){
+            instance = new Logger();
+        }
         return instance;
-
     }
 
-    public void log(String msg){
+    public void log(String message){
 
-        try{
+        String logMessage = LocalDateTime.now() + " - " + message;
 
-            FileWriter fw=new FileWriter("activity.log",true);
+        // Print in console
+        System.out.println("[LOG] " + logMessage);
 
-            fw.write(msg+"\n");
-
-            fw.close();
-
+        // Save to file (optional but impressive)
+        try(FileWriter fw = new FileWriter("log.txt", true)){
+            fw.write(logMessage + "\n");
+        } catch(IOException e){
+            System.out.println("Logging failed");
         }
-        catch(Exception e){
-
-            System.out.println("Log failed");
-
-        }
-
     }
 }

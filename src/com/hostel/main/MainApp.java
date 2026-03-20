@@ -32,17 +32,19 @@ public class MainApp {
         FeeReminder reminder = new FeeReminder(students);
         reminder.start();
 
+        Logger logger = Logger.getInstance(); // ✅ SINGLE LOGGER INSTANCE
+
         while(true){
 
             printHeader();
 
-           System.out.println("1. Add Student");
+            System.out.println("1. Add Student");
             System.out.println("2. Allocate Room");
-           System.out.println("3. Pay Fee");
-           System.out.println("4. View Students");
-           System.out.println("5. Register Complaint");
-           System.out.println("6. View Complaints");
-           System.out.println("7. Search Student");
+            System.out.println("3. Pay Fee");
+            System.out.println("4. View Students");
+            System.out.println("5. Register Complaint");
+            System.out.println("6. View Complaints");
+            System.out.println("7. Search Student");
             System.out.println("8. Exit");
             System.out.println("=================================");
             System.out.print("Enter Choice: ");
@@ -50,6 +52,7 @@ public class MainApp {
             if(!sc.hasNextInt()){
                 System.out.println("Invalid input! Please enter a number.");
                 sc.next();
+                logger.log("Invalid menu input entered");
                 continue;
             }
 
@@ -68,7 +71,7 @@ public class MainApp {
 
                     students.add(new Student(id,name));
 
-                    Logger.getInstance().log("Student added " + name);
+                    logger.log("Student added: " + name);
                     System.out.println("✔ Student added successfully!");
 
                     break;
@@ -87,23 +90,22 @@ public class MainApp {
                             found = true;
 
                             try{
-
                                 service.allocateRoom(s);
 
+                                logger.log("Room allocated to student ID: " + sid);
                                 System.out.println("✔ Room allocated: " + s.getRoomNumber());
 
-                            }
-                            catch(Exception e){
+                            } catch(Exception e){
 
+                                logger.log("Room allocation failed: " + e.getMessage());
                                 System.out.println("❌ " + e.getMessage());
-
                             }
 
                         }
-
                     }
 
                     if(!found){
+                        logger.log("Room allocation failed: Student ID not found " + sid);
                         System.out.println("Student not found.");
                     }
 
@@ -121,12 +123,14 @@ public class MainApp {
                         if(s.getId() == pid){
                             s.payFee();
                             paid = true;
+
+                            logger.log("Fee paid by student ID: " + pid);
                             System.out.println("✔ Fee payment successful");
                         }
-
                     }
 
                     if(!paid){
+                        logger.log("Fee payment failed: Student not found " + pid);
                         System.out.println("Student not found.");
                     }
 
@@ -145,97 +149,106 @@ public class MainApp {
                                 s.getName(),
                                 s.getRoomNumber(),
                                 s.isFeePaid() ? "Paid" : "Pending");
-
                     }
+
+                    logger.log("Viewed all student records");
 
                     break;
 
                 case 5:
 
-    System.out.print("Enter Student ID: ");
-    int cid = sc.nextInt();
-    sc.nextLine();
+                    System.out.print("Enter Student ID: ");
+                    int cid = sc.nextInt();
+                    sc.nextLine();
 
-    boolean exists = false;
+                    boolean exists = false;
 
-    for(Student s : students){
-        if(s.getId() == cid){
-            exists = true;
-            break;
-        }
-    }
+                    for(Student s : students){
+                        if(s.getId() == cid){
+                            exists = true;
+                            break;
+                        }
+                    }
 
-    if(!exists){
-        System.out.println("❌ Student not found. Cannot register complaint.");
-        break;
-    }
+                    if(!exists){
+                        logger.log("Complaint failed: Student not found " + cid);
+                        System.out.println("❌ Student not found.");
+                        break;
+                    }
 
-    System.out.print("Enter complaint: ");
-    String msg = sc.nextLine();
+                    System.out.print("Enter complaint: ");
+                    String msg = sc.nextLine();
 
-    complaints.add(new Complaint(cid, msg));
+                    complaints.add(new Complaint(cid, msg));
 
-    Logger.getInstance().log("Complaint added by Student ID: " + cid);
+                    logger.log("Complaint registered by student ID: " + cid);
+                    System.out.println("✔ Complaint registered successfully!");
 
-    System.out.println("✔ Complaint registered successfully!");
+                    break;
 
-    break;
-
-     
                 case 6:
 
-    if(complaints.isEmpty()){
-        System.out.println("No complaints found.");
-        break;
-    }
+                    if(complaints.isEmpty()){
+                        System.out.println("No complaints found.");
+                        logger.log("Viewed complaints: none found");
+                        break;
+                    }
 
-    System.out.println("\n------ Complaint List ------");
+                    System.out.println("\n------ Complaint List ------");
 
-    for(Complaint c : complaints){
-        System.out.println("Student ID: " + c.getStudentId());
-        System.out.println("Complaint: " + c.getMessage());
-        System.out.println("----------------------------");
-    }
+                    for(Complaint c : complaints){
+                        System.out.println("Student ID: " + c.getStudentId());
+                        System.out.println("Complaint: " + c.getMessage());
+                        System.out.println("----------------------------");
+                    }
 
-    break;
-    case 7:
+                    logger.log("Viewed all complaints");
 
-    System.out.print("Enter Student ID: ");
-    int searchId = sc.nextInt();
+                    break;
 
-    Optional<Student> result = students.stream()
-            .filter(s -> s.getId() == searchId)
-            .findFirst();
+                case 7:
 
-    if(result.isPresent()){
-        Student s = result.get();
+                    System.out.print("Enter Student ID: ");
+                    int searchId = sc.nextInt();
 
-        System.out.println("\n--------- Student Details ---------");
-        System.out.println("ID: " + s.getId());
-        System.out.println("Name: " + s.getName());
-        System.out.println("Room: " + s.getRoomNumber());
-        System.out.println("Fee Status: " + (s.isFeePaid() ? "Paid" : "Pending"));
-        System.out.println("-----------------------------------");
+                    boolean studentFound = false;
 
-    } else {
-        System.out.println("❌ Student not found.");
-    }
+                    for(Student s : students){
 
-    break;
+                        if(s.getId() == searchId){
+
+                            studentFound = true;
+
+                            System.out.println("\n--------- Student Details ---------");
+                            System.out.println("ID: " + s.getId());
+                            System.out.println("Name: " + s.getName());
+                            System.out.println("Room: " + s.getRoomNumber());
+                            System.out.println("Fee Status: " + (s.isFeePaid() ? "Paid" : "Pending"));
+                            System.out.println("-----------------------------------");
+
+                            logger.log("Student searched: ID " + searchId);
+                            break;
+                        }
+                    }
+
+                    if(!studentFound){
+                        logger.log("Search failed: Student not found " + searchId);
+                        System.out.println("❌ Student not found.");
+                    }
+
+                    break;
 
                 case 8:
 
+                    logger.log("System exited by user");
                     System.out.println("\nThank you for using Hostel Management System.");
                     System.exit(0);
 
                 default:
 
+                    logger.log("Invalid menu choice selected: " + ch);
                     System.out.println("Invalid choice!");
-
             }
-
         }
-
     }
-
 }
