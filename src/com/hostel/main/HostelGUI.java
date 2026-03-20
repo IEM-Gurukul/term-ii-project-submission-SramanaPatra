@@ -3,7 +3,10 @@ package com.hostel.main;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.util.*;
 
 import com.hostel.model.*;
