@@ -3,18 +3,16 @@ package com.hostel.main;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
+import java.util.*;
 
 import com.hostel.model.*;
 import com.hostel.service.*;
 
 public class HostelGUI {
 
-    private static java.util.List<Student> students = new java.util.ArrayList<>();
-    private static java.util.List<Room> rooms = new java.util.ArrayList<>();
+    private static List<Student> students = new ArrayList<>();
+    private static List<Room> rooms = new ArrayList<>();
     private static HostelService service;
 
     private static DefaultTableModel tableModel;
@@ -38,13 +36,13 @@ public class HostelGUI {
         /* ---------------- TITLE ---------------- */
 
         JLabel title = new JLabel("SMART HOSTEL MANAGEMENT SYSTEM",SwingConstants.CENTER);
-        title.setFont(new Font("Arial",Font.BOLD,30));
+        title.setFont(new Font("Arial",Font.BOLD,28));
         title.setForeground(new Color(45,62,80));
         title.setBorder(BorderFactory.createEmptyBorder(20,0,20,0));
 
         frame.add(title,BorderLayout.NORTH);
 
-        /* ---------------- DASHBOARD ---------------- */
+        /* ---------------- SIDEBAR ---------------- */
 
         JPanel dashboard = new JPanel();
         dashboard.setLayout(new GridLayout(5,1,15,15));
@@ -54,7 +52,7 @@ public class HostelGUI {
         JButton addStudent = createButton("Add Student");
         JButton allocateRoom = createButton("Allocate Room");
         JButton payFee = createButton("Pay Fee");
-        JButton viewStudents = createButton("View Students");
+        JButton viewStudents = createButton("Refresh Table");
         JButton exit = createButton("Exit");
 
         dashboard.add(addStudent);
@@ -67,27 +65,22 @@ public class HostelGUI {
 
         /* ---------------- TABLE ---------------- */
 
-        String[] columns = {"ID","Name","Room","Fee Paid"};
-
+        String[] columns = {"ID","Name","Room","Fee Status"};
         tableModel = new DefaultTableModel(columns,0);
 
         JTable table = new JTable(tableModel);
-
-        table.setRowHeight(30);
+        table.setRowHeight(28);
         table.setFont(new Font("Arial",Font.PLAIN,14));
         table.setSelectionBackground(new Color(100,149,237));
         table.setGridColor(Color.LIGHT_GRAY);
-        table.setShowVerticalLines(false);
 
         table.getTableHeader().setFont(new Font("Arial",Font.BOLD,14));
         table.getTableHeader().setBackground(new Color(45,62,80));
         table.getTableHeader().setForeground(Color.WHITE);
 
-        JScrollPane scrollPane = new JScrollPane(table);
+        frame.add(new JScrollPane(table),BorderLayout.CENTER);
 
-        frame.add(scrollPane,BorderLayout.CENTER);
-
-        /* ---------------- STATISTICS PANEL ---------------- */
+        /* ---------------- STATS ---------------- */
 
         JPanel statsPanel = new JPanel(new GridLayout(1,3,20,20));
         statsPanel.setBorder(BorderFactory.createEmptyBorder(15,20,15,20));
@@ -102,16 +95,12 @@ public class HostelGUI {
 
         frame.add(statsPanel,BorderLayout.SOUTH);
 
-        /* ---------------- BUTTON ACTIONS ---------------- */
+        /* ---------------- ACTIONS ---------------- */
 
         addStudent.addActionListener(e -> addStudent());
-
         allocateRoom.addActionListener(e -> allocateRoom());
-
         payFee.addActionListener(e -> payFee());
-
         viewStudents.addActionListener(e -> refreshTable());
-
         exit.addActionListener(e -> System.exit(0));
 
         frame.setVisible(true);
@@ -123,11 +112,11 @@ public class HostelGUI {
 
         JButton button = new JButton(text);
 
-        button.setFont(new Font("Arial",Font.BOLD,16));
+        button.setFont(new Font("Arial",Font.BOLD,15));
         button.setFocusPainted(false);
         button.setBackground(new Color(70,130,180));
         button.setForeground(Color.WHITE);
-        button.setBorder(BorderFactory.createEmptyBorder(15,10,15,10));
+        button.setBorder(BorderFactory.createEmptyBorder(12,10,12,10));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
 
@@ -138,7 +127,6 @@ public class HostelGUI {
             public void mouseExited(java.awt.event.MouseEvent evt){
                 button.setBackground(new Color(70,130,180));
             }
-
         });
 
         return button;
@@ -149,7 +137,7 @@ public class HostelGUI {
     private static JLabel createStatLabel(String text){
 
         JLabel label = new JLabel(text,SwingConstants.CENTER);
-        label.setFont(new Font("Arial",Font.BOLD,16));
+        label.setFont(new Font("Arial",Font.BOLD,15));
         label.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
         return label;
@@ -167,33 +155,26 @@ public class HostelGUI {
                 "Student Name:", nameField
         };
 
-        int option = JOptionPane.showConfirmDialog(
-                null,
-                fields,
-                "Add Student",
-                JOptionPane.OK_CANCEL_OPTION
-        );
+        int option = JOptionPane.showConfirmDialog(null, fields, "Add Student", JOptionPane.OK_CANCEL_OPTION);
 
         if(option == JOptionPane.OK_OPTION){
 
             try{
+                int id = Integer.parseInt(idField.getText().trim());
+                String name = nameField.getText().trim();
 
-                int id = Integer.parseInt(idField.getText());
-                String name = nameField.getText();
+                if(name.isEmpty()){
+                    JOptionPane.showMessageDialog(null,"Name cannot be empty");
+                    return;
+                }
 
-                Student s = new Student(id,name);
-
-                students.add(s);
-
+                students.add(new Student(id,name));
                 refreshTable();
 
-                JOptionPane.showMessageDialog(null,"Student Added Successfully");
+                JOptionPane.showMessageDialog(null,"✔ Student Added Successfully");
 
-            }
-            catch(Exception ex){
-
-                JOptionPane.showMessageDialog(null,"Invalid Input");
-
+            } catch(Exception e){
+                JOptionPane.showMessageDialog(null,"❌ Invalid Input");
             }
         }
     }
@@ -202,67 +183,68 @@ public class HostelGUI {
 
     private static void allocateRoom(){
 
-        String input = JOptionPane.showInputDialog("Enter Student ID");
+        try{
+            String input = JOptionPane.showInputDialog("Enter Student ID");
+            if(input == null) return;
 
-        if(input == null) return;
+            int id = Integer.parseInt(input.trim());
 
-        int id = Integer.parseInt(input);
+            for(Student s : students){
 
-        for(Student s : students){
+                if(s.getId() == id){
 
-            if(s.getId() == id){
+                    try{
+                        service.allocateRoom(s);
+                        refreshTable();
 
-                try{
+                        JOptionPane.showMessageDialog(null,
+                                "✔ Room Allocated: "+s.getRoomNumber());
 
-                    service.allocateRoom(s);
+                    } catch(Exception e){
+                        JOptionPane.showMessageDialog(null,"❌ "+e.getMessage());
+                    }
 
-                    refreshTable();
-
-                    JOptionPane.showMessageDialog(null,
-                            "Room Allocated: "+s.getRoomNumber());
-
+                    return;
                 }
-                catch(Exception e){
-
-                    JOptionPane.showMessageDialog(null,e.getMessage());
-
-                }
-
-                return;
             }
-        }
 
-        JOptionPane.showMessageDialog(null,"Student not found");
+            JOptionPane.showMessageDialog(null,"❌ Student not found");
+
+        } catch(Exception e){
+            JOptionPane.showMessageDialog(null,"❌ Invalid Input");
+        }
     }
 
     /* ---------------- PAY FEE ---------------- */
 
     private static void payFee(){
 
-        String input = JOptionPane.showInputDialog("Enter Student ID");
+        try{
+            String input = JOptionPane.showInputDialog("Enter Student ID");
+            if(input == null) return;
 
-        if(input == null) return;
+            int id = Integer.parseInt(input.trim());
 
-        int id = Integer.parseInt(input);
+            for(Student s : students){
 
-        for(Student s : students){
+                if(s.getId() == id){
 
-            if(s.getId() == id){
+                    s.payFee();
+                    refreshTable();
 
-                s.payFee();
-
-                refreshTable();
-
-                JOptionPane.showMessageDialog(null,"Fee Paid Successfully");
-
-                return;
+                    JOptionPane.showMessageDialog(null,"✔ Fee Paid Successfully");
+                    return;
+                }
             }
-        }
 
-        JOptionPane.showMessageDialog(null,"Student not found");
+            JOptionPane.showMessageDialog(null,"❌ Student not found");
+
+        } catch(Exception e){
+            JOptionPane.showMessageDialog(null,"❌ Invalid Input");
+        }
     }
 
-    /* ---------------- UPDATE TABLE + STATS ---------------- */
+    /* ---------------- REFRESH TABLE ---------------- */
 
     private static void refreshTable(){
 
@@ -283,9 +265,8 @@ public class HostelGUI {
                     s.getId(),
                     s.getName(),
                     s.getRoomNumber(),
-                    s.isFeePaid()
+                    s.isFeePaid() ? "Paid" : "Pending"
             });
-
         }
 
         totalStudentsLabel.setText("Total Students: "+students.size());
