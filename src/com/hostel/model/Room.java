@@ -1,26 +1,32 @@
 package com.hostel.model;
 
+import java.util.*;
+
 public class Room {
 
     private int roomNumber;
     private int capacity;
-    private int occupied;
+    private List<Student> occupants;
 
-    public Room(int roomNumber,int capacity){
+    public Room(int roomNumber, int capacity){
         this.roomNumber = roomNumber;
         this.capacity = capacity;
-        this.occupied = 0;
-    }
-
-    public boolean hasSpace(){
-        return occupied < capacity;
-    }
-
-    public void allocate(){
-        occupied++;
+        this.occupants = new ArrayList<>();
     }
 
     public int getRoomNumber(){
         return roomNumber;
+    }
+
+    public int getCapacity(){
+        return capacity;
+    }
+
+    public List<Student> getOccupants(){
+        return occupants;
+    }
+
+    public void addStudent(Student s){
+        occupants.add(s);
     }
 }

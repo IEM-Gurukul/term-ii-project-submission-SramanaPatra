@@ -26,8 +26,15 @@ public class HostelGUI {
 
     public static void main(String[] args) {
 
-        rooms.add(new Room(101,2));
-        rooms.add(new Room(102,2));
+        /* 🔥 Dynamic Room Input */
+        String roomInput = JOptionPane.showInputDialog("Enter number of rooms:");
+        if(roomInput == null) System.exit(0);
+
+        int roomCount = Integer.parseInt(roomInput);
+
+        for(int i = 0; i < roomCount; i++){
+            rooms.add(new Room(101 + i, 2));
+        }
 
         service = new HostelService(rooms);
 
@@ -196,6 +203,11 @@ public class HostelGUI {
 
                 if(s.getId() == id){
 
+                    if(s.getRoomNumber() != 0){
+                        JOptionPane.showMessageDialog(null,"⚠ Room already allocated!");
+                        return;
+                    }
+
                     try{
                         service.allocateRoom(s);
                         refreshTable();
@@ -231,6 +243,16 @@ public class HostelGUI {
             for(Student s : students){
 
                 if(s.getId() == id){
+
+                    if(s.getRoomNumber() == 0){
+                        JOptionPane.showMessageDialog(null,"❌ Cannot pay fee. Room not allocated.");
+                        return;
+                    }
+
+                    if(s.isFeePaid()){
+                        JOptionPane.showMessageDialog(null,"⚠ Fee already paid.");
+                        return;
+                    }
 
                     s.payFee();
                     refreshTable();

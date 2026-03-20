@@ -24,17 +24,21 @@ public class MainApp {
         List<Room> rooms = new ArrayList<>();
         List<Complaint> complaints = new ArrayList<>();
 
-        // Room initialization
-        rooms.add(new Room(101,2));
-        rooms.add(new Room(102,2));
+        // 🔥 Dynamic Room Creation
+        System.out.print("Enter number of rooms: ");
+        int roomCount = sc.nextInt();
+
+        for(int i = 0; i < roomCount; i++){
+            rooms.add(new Room(101 + i, 2));
+        }
 
         HostelService service = new HostelService(rooms);
 
-        // Start Fee Reminder Thread
+        // Fee Reminder Thread
         FeeReminder reminder = new FeeReminder(students);
         reminder.start();
 
-        // Logger instance
+        // Logger
         Logger logger = Logger.getInstance();
 
         while(true){
@@ -52,7 +56,6 @@ public class MainApp {
             System.out.println("=================================");
             System.out.print("Enter Choice: ");
 
-            // Input validation
             if(!sc.hasNextInt()){
                 System.out.println("Invalid input! Please enter a number.");
                 logger.log("Invalid menu input");
@@ -95,6 +98,12 @@ public class MainApp {
 
                             found = true;
 
+                            if(s.getRoomNumber() != 0){
+                                System.out.println("⚠ Room already allocated.");
+                                logger.log("Duplicate allocation attempt for student " + sid);
+                                break;
+                            }
+
                             try{
                                 service.allocateRoom(s);
 
@@ -127,6 +136,21 @@ public class MainApp {
                     for(Student s : students){
 
                         if(s.getId() == pid){
+
+                            if(s.getRoomNumber() == 0){
+                                System.out.println("❌ Cannot pay fee. Room not allocated.");
+                                logger.log("Fee payment failed: No room for student " + pid);
+                                paid = true;
+                                break;
+                            }
+
+                            if(s.isFeePaid()){
+                                System.out.println("⚠ Fee already paid.");
+                                logger.log("Fee already paid by student " + pid);
+                                paid = true;
+                                break;
+                            }
+
                             s.payFee();
                             paid = true;
 
