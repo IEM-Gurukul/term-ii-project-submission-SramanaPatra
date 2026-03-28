@@ -26,7 +26,15 @@ public class Room {
         return occupants;
     }
 
+    public boolean hasSpace(){
+        return occupants.size() < capacity;
+    }
+
     public void addStudent(Student s){
-        occupants.add(s);
+        if(hasSpace()){
+            occupants.add(s);
+        } else {
+            throw new RuntimeException("Room is full");
+        }
     }
 }

@@ -5,16 +5,16 @@ import java.util.List;
 
 public class FirstAvailableStrategy implements RoomAllocationStrategy {
 
-    public Room allocate(List<Room> rooms){
+    @Override
+    public Room allocate(List<Room> rooms) {
 
-        for(Room r:rooms){
+        for(Room r : rooms){
 
-            if(r.hasSpace())
-                return r;
-
+            if(r.hasSpace()){
+                return r;   // return first available room
+            }
         }
 
-        return null;
-
+        return null; // no room available
     }
 }
